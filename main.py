@@ -78,3 +78,4 @@ if __name__ == '__main__':
         if pressed[pygame.K_RIGHT] or pressed[pygame.K_LEFT]:
             game.update()
     pygame.quit()
+
