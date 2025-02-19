@@ -1,7 +1,8 @@
+import pygame
 import os
 import sys
-import pygame
-import random
+
+FPS = 50
 
 
 def load_image(name, colorkey=None):
@@ -13,69 +14,48 @@ def load_image(name, colorkey=None):
     return image
 
 
-class Block(pygame.sprite.Sprite):
-    image = pygame.Surface([100, 20])
-    image.fill((255, 255, 255))
-
-    def __init__(self, group, clock):
-        super().__init__(group)
-        self.image = Block.image
-        self.rect = self.image.get_rect()
-        self.rect.x = random.randint(0, 350)
-        self.rect.y = -100
-        self.clock = clock
-        all_sprites.draw(screen)
-
-    def update(self):
-        screen.fill('blue')
-        if self.rect.y >= 800:
-            del self
-            return 0
-        self.rect.y += 150
-        return self
+def terminate():
+    pygame.quit()
+    sys.exit()
 
 
-class Display(pygame.sprite.Sprite):
+def start_screen():
+    intro_text = ["Press any button to continue"]
 
-    def __init__(self, group, clock):
-        super().__init__()
-        Block(group, clock)
-        self.image = Block.image
-        self.rect = self.image.get_rect()
-        self.group = all_sprites
-        self.clock = clock
+    fon = pygame.transform.scale(load_image('fon.jpg'), (800, 600))
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 30)
+    text_coord = 500
+    for line in intro_text:
+        string_rendered = font.render(line, 1, pygame.Color('green'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 270
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
 
-    def update(self):
-        Block(all_sprites, self.clock)
-        screen.fill('blue')
-        all_sprites.update()
-        clock.tick(10)
-        return self
-
-
-if __name__ == '__main__':
-    pygame.init()
-    size = width, height = 400, 800
-    screen = pygame.display.set_mode(size)
-    pygame.display.set_caption('Game over')
-    screen.fill('blue')
-    pygame.display.update()
-    clock = pygame.time.Clock()
-    all_sprites = pygame.sprite.Group()
-    game = Display(all_sprites, clock)
-    all_sprites.draw(screen)
-    pygame.display.flip()
-    running = True
-    while running:
-        pressed = pygame.key.get_pressed()
-        all_sprites.draw(screen)
-        pygame.display.flip()
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.KEYDOWN and (event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT):
-                game.update()
-        if pressed[pygame.K_RIGHT] or pressed[pygame.K_LEFT]:
-            game.update()
-    pygame.quit()
+                terminate()
+            elif event.type == pygame.KEYDOWN or \
+                    event.type == pygame.MOUSEBUTTONDOWN:
+                return True
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
+pygame.init()
+size = width, height = 800, 600
+screen = pygame.display.set_mode(size)
+pygame.display.set_caption('Doodle prygaet')
+screen.fill('blue')
+pygame.display.update()
+clock = pygame.time.Clock()
+# группа спрайтов для блоков
+all_sprites = pygame.sprite.Group()
+all_sprites.draw(screen)
+pygame.display.flip()
+if start_screen():
 
