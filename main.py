@@ -31,13 +31,14 @@ def terminate():
 # заставка игры
 def start_window():
     intro_text = ["DOODLE PRYGAET"]
+    nums = ["1", "2", "3", "4", "5"]
     image = pygame.Surface([800, 600])
-    image.fill((226, 247, 223))
+    image.fill((243, 222, 211))
 
     fon = pygame.transform.scale(image, (800, 600))
     screen.blit(fon, (0, 0))
-    font = pygame.font.Font('C:\\Users\\2V30\\PycharmProjects\\pythonProject8\\Sigmar-Regular.ttf', 70)
-    text_coord = 50
+    font = pygame.font.Font('Snap_ITC.ttf', 65)
+    text_coord = 70
     # выводим описание игры
     for line in intro_text:
         string_rendered = font.render(line, 1, (19, 50, 21))
@@ -45,7 +46,7 @@ def start_window():
         print(intro_rect.width)
         text_coord += 10
         intro_rect.top = text_coord
-        intro_rect.x = 60
+        intro_rect.x = 50
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
     pygame.draw.rect(screen, (146, 173, 117), (60, 300, 110, 110))
@@ -53,7 +54,16 @@ def start_window():
     pygame.draw.rect(screen, (146, 173, 117), (348, 300, 110, 110))
     pygame.draw.rect(screen, (146, 173, 117), (492, 300, 110, 110))
     pygame.draw.rect(screen, (146, 173, 117), (636, 300, 110, 110))
-
+    text_coord = 100
+    for n in nums:
+        string_rendered = font.render(n, 1, (19, 50, 21))
+        intro_rect = string_rendered.get_rect()
+        print(intro_rect.width)
+        intro_rect.top = 310
+        intro_rect.x = text_coord
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+        text_coord += 55
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
