@@ -4,13 +4,14 @@ import pygame
 import random
 
 pygame.init()
+
 WIDTH = 800
 HEIGHT = 600
 FPS = 120
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
-FCOLOR = (243, 222, 211)
+FCOLOR = WHITE
 
 
 # загрузка изображения для спрайтов
@@ -61,17 +62,25 @@ def first_screen():
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((20, 20))  # Размер игрока
-        self.image.fill(GREEN)
+        self.image_right = pygame.image.load('right.png').convert_alpha()
+        self.image_left = pygame.image.load('left.png').convert_alpha()
+
+        # По умолчанию используем изображение right.png
+        self.image = self.image_right
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH // 2  # Положение по центру
         self.rect.bottom = HEIGHT - 50  # Положение внизу экрана
         self.speedy = 0  # Начальная скорость
         self.gravity = 0.2  # Гравитация
         self.speedx = 0  # Горизонтальная скорость
-        self.score = 0
 
     def update(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.image = self.image_left  # Меняем изображение на left.png
+            self.speedx = -10  # Движемся влево
+        elif keys[pygame.K_RIGHT]:
+            self.image = self.image_right  # Возвращаемся к right.png
         self.speedy += self.gravity  # Ускорение падения
         self.rect.y += self.speedy  # Перемещение по вертикали
         self.rect.x += self.speedx  # Перемещение по горизонтали
@@ -123,10 +132,9 @@ class Display(pygame.sprite.Sprite):
         self.group = group
         self.clock = clock
 
-    def update(self, player):
+    def update(self):
         # добавляем новый юлок при передвижении персонажа(чтобы их бфло бесконечное количество)
         Block(self.group, self.clock)
-        player.score += 1
         screen.fill(FCOLOR)
         self.group.update()  # обновляем пложение всех блоков
         clock.tick(FPS)
@@ -189,10 +197,9 @@ if __name__ == '__main__':
                 player.speedy = -10  # Прыжок
                 # если это не стартовый блок и игрок достиг середины экрана
                 if hits[0] != initial_platform and player.rect.top <= HEIGHT // 2:
-                    game.update(player)  # двигаем блоки(продвигаем игрока вверх)
-            screen.fill(FCOLOR)
+                    game.update()  # двигаем блоки(продвигаем игрока вверх)
+            screen.fill(WHITE)
             all_sprites.draw(screen)
             platforms.draw(screen)
             pygame.display.flip()
-        print(player.score)
         pygame.quit()
