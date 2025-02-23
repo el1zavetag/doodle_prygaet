@@ -10,7 +10,7 @@ FPS = 120
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
-FCOLOR = WHITE
+FCOLOR = (243, 222, 211)
 
 
 # загрузка изображения для спрайтов
@@ -69,6 +69,7 @@ class Player(pygame.sprite.Sprite):
         self.speedy = 0  # Начальная скорость
         self.gravity = 0.2  # Гравитация
         self.speedx = 0  # Горизонтальная скорость
+        self.score = 0
 
     def update(self):
         self.speedy += self.gravity  # Ускорение падения
@@ -122,9 +123,10 @@ class Display(pygame.sprite.Sprite):
         self.group = group
         self.clock = clock
 
-    def update(self):
+    def update(self, player):
         # добавляем новый юлок при передвижении персонажа(чтобы их бфло бесконечное количество)
         Block(self.group, self.clock)
+        player.score += 1
         screen.fill(FCOLOR)
         self.group.update()  # обновляем пложение всех блоков
         clock.tick(FPS)
@@ -187,9 +189,10 @@ if __name__ == '__main__':
                 player.speedy = -10  # Прыжок
                 # если это не стартовый блок и игрок достиг середины экрана
                 if hits[0] != initial_platform and player.rect.top <= HEIGHT // 2:
-                    game.update()  # двигаем блоки(продвигаем игрока вверх)
-            screen.fill(WHITE)
+                    game.update(player)  # двигаем блоки(продвигаем игрока вверх)
+            screen.fill(FCOLOR)
             all_sprites.draw(screen)
             platforms.draw(screen)
             pygame.display.flip()
+        print(player.score)
         pygame.quit()
