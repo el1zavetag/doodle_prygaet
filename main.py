@@ -6,7 +6,7 @@ import random
 pygame.init()
 WIDTH = 800
 HEIGHT = 600
-FPS = 100
+FPS = 120
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
@@ -36,10 +36,10 @@ def first_screen():
     fon = pygame.transform.scale(load_image('fon.jpg'), (800, 600))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
-    text_coord = 500
+    text_coord = 550
     # выводим описание игры
     for line in intro_text:
-        string_rendered = font.render(line, 1, pygame.Color('green'))
+        string_rendered = font.render(line, 1, (19, 50, 21))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
