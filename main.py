@@ -6,7 +6,7 @@ import random
 pygame.init()
 WIDTH = 800
 HEIGHT = 600
-FPS = 50
+FPS = 100
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
@@ -22,12 +22,14 @@ def load_image(name, colorkey=None):
     image = pygame.image.load(fullname)
     return image
 
-#закрытие игры
+
+# закрытие игры
 def terminate():
     pygame.quit()
     sys.exit()
 
-#заставка игры
+
+# заставка игры
 def first_screen():
     intro_text = ["Press any button to continue"]
 
@@ -65,7 +67,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.centerx = WIDTH // 2  # Положение по центру
         self.rect.bottom = HEIGHT - 50  # Положение внизу экрана
         self.speedy = 0  # Начальная скорость
-        self.gravity = 0.6  # Гравитация
+        self.gravity = 0.4  # Гравитация
         self.speedx = 0  # Горизонтальная скорость
 
     def update(self):
@@ -77,6 +79,8 @@ class Player(pygame.sprite.Sprite):
             self.rect.left = 0
         elif self.rect.right > WIDTH:
             self.rect.right = WIDTH
+
+        clock.tick(FPS)
 
         if self.rect.top > HEIGHT:  # Если игрок падает ниже экрана
             self.kill()
@@ -101,7 +105,7 @@ class Block(pygame.sprite.Sprite):
     def update(self):
         screen.fill(FCOLOR)
         if self.rect.y >= HEIGHT:
-            del self  # когда доходит до края уничтожаем блок
+            self.kill()  # когда доходит до края уничтожаем блок
             return 0
         self.rect.y += 100
         return self
@@ -123,7 +127,7 @@ class Display(pygame.sprite.Sprite):
         Block(self.group, self.clock)
         screen.fill(FCOLOR)
         self.group.update()  # обновляем пложение всех блоков
-        clock.tick(10)
+        clock.tick(FPS)
         return self
 
 
@@ -181,7 +185,7 @@ if __name__ == '__main__':
             hits = pygame.sprite.spritecollide(player, platforms, False)
             # если сталкивается с блоком
             if hits:
-                player.speedy = -15  # Прыжок
+                player.speedy = -10  # Прыжок
                 # если это не стартовый блок и игрок достиг середины экрана
                 if hits[0] != initial_platform and player.rect.top <= HEIGHT // 2:
                     game.update()  # двигаем блоки(продвигаем игрока вверх)
