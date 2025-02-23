@@ -6,7 +6,7 @@ import random
 pygame.init()
 WIDTH = 800
 HEIGHT = 600
-FPS = 60
+FPS = 50
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
@@ -54,6 +54,33 @@ def first_screen():
         clock.tick(FPS)
 
 
+# Класс игрока
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.Surface((20, 20))  # Размер игрока
+        self.image.fill(GREEN)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = WIDTH // 2  # Положение по центру
+        self.rect.bottom = HEIGHT - 50  # Положение внизу экрана
+        self.speedy = 0  # Начальная скорость
+        self.gravity = 0.6  # Гравитация
+        self.speedx = 0  # Горизонтальная скорость
+
+    def update(self):
+        self.speedy += self.gravity  # Ускорение падения
+        self.rect.y += self.speedy  # Перемещение по вертикали
+        self.rect.x += self.speedx  # Перемещение по горизонтали
+
+        if self.rect.left < 0:
+            self.rect.left = 0
+        elif self.rect.right > WIDTH:
+            self.rect.right = WIDTH
+
+        if self.rect.top > HEIGHT:  # Если игрок падает ниже экрана
+            self.kill()
+
+
 # спрайт одного блока
 class Block(pygame.sprite.Sprite):
     # задаётся прямоугольником
@@ -75,7 +102,7 @@ class Block(pygame.sprite.Sprite):
         if self.rect.y >= HEIGHT:
             del self  # когда доходит до края уничтожаем блок
             return 0
-        self.rect.y += 100
+        self.rect.y += 150
         return self
 
 
@@ -87,14 +114,14 @@ class Display(pygame.sprite.Sprite):
         Block(group, clock)
         self.image = Block.image
         self.rect = self.image.get_rect()
-        self.group = all_sprites
+        self.group = group
         self.clock = clock
 
     def update(self):
         # добавляем новый юлок при передвижении персонажа(чтобы их бфло бесконечное количество)
-        Block(all_sprites, self.clock)
+        Block(self.group, self.clock)
         screen.fill(FCOLOR)
-        all_sprites.update()  # обновляем пложение всех блоков
+        self.group.update()  # обновляем пложение всех блоков
         clock.tick(10)
         return self
 
@@ -112,11 +139,27 @@ if __name__ == '__main__':
         pygame.display.update()
         # группа спрайтов для блоков
         all_sprites = pygame.sprite.Group()
+        platforms = pygame.sprite.Group()
+        # Первая платформа
+        initial_platform = Block(platforms, clock)
+        initial_platform.rect.x = WIDTH // 2
+        initial_platform.rect.y = HEIGHT - 50
+        #all_sprites.add(initial_platform)
+        # Другие платформы
+        for i in range(5):
+            p = Block(platforms, clock)
+            p.rect.x = random.randrange(WIDTH - 50)
+            p.rect.y = initial_platform.rect.y - 100 * (i + 1)
+            #all_sprites.add(p)
+        player = Player()
+        all_sprites.add(player)
         # спрайт фона игры
-        game = Display(all_sprites, clock)
+        game = Display(platforms, clock)
         all_sprites.draw(screen)
         pygame.display.flip()
         running = True
+        hits = []
+        fl = False
         while running:
             pressed = pygame.key.get_pressed()
             all_sprites.draw(screen)
@@ -124,10 +167,25 @@ if __name__ == '__main__':
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-                # если нажали правую или левую стрелку меняем фон
-                if event.type == pygame.KEYDOWN and (event.key == pygame.K_RIGHT or event.key == pygame.K_LEFT):
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT:
+                        player.speedx = -10  # Движение влево
+                        player.speedy = -15  # Движение влево
+                    elif event.key == pygame.K_RIGHT:
+                        player.speedx = 10  # Движение вправо
+                        player.speedy = -15  # Движение влево
+                elif event.type == pygame.KEYUP:
+                    if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                        player.speedx = 0
+            all_sprites.update()
+            hits = pygame.sprite.spritecollide(player, platforms, False)
+            if hits:
+                print(hits, end='\n')
+                player.speedy = -15  # Прыжок
+                if hits[0] != initial_platform and player.rect.top < HEIGHT // 2:
                     game.update()
-            # если правая или левая кнопка зажаты меняем фон
-            if pressed[pygame.K_RIGHT] or pressed[pygame.K_LEFT]:
-                game.update()
+            screen.fill(WHITE)
+            all_sprites.draw(screen)
+            platforms.draw(screen)
+            pygame.display.flip()
         pygame.quit()
