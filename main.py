@@ -67,7 +67,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.centerx = WIDTH // 2  # Положение по центру
         self.rect.bottom = HEIGHT - 50  # Положение внизу экрана
         self.speedy = 0  # Начальная скорость
-        self.gravity = 0.4  # Гравитация
+        self.gravity = 0.2  # Гравитация
         self.speedx = 0  # Горизонтальная скорость
 
     def update(self):
@@ -174,10 +174,8 @@ if __name__ == '__main__':
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LEFT:
                         player.speedx = -10  # Движение влево
-                        player.speedy = -15  # Движение вверх
                     elif event.key == pygame.K_RIGHT:
                         player.speedx = 10  # Движение вправо
-                        player.speedy = -15  # Движение вверх
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                         player.speedx = 0
