@@ -22,12 +22,12 @@ def load_image(name, colorkey=None):
     image = pygame.image.load(fullname)
     return image
 
-
+#закрытие игры
 def terminate():
     pygame.quit()
     sys.exit()
 
-
+#заставка игры
 def first_screen():
     intro_text = ["Press any button to continue"]
 
@@ -35,6 +35,7 @@ def first_screen():
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
     text_coord = 500
+    # выводим описание игры
     for line in intro_text:
         string_rendered = font.render(line, 1, pygame.Color('green'))
         intro_rect = string_rendered.get_rect()
@@ -102,7 +103,7 @@ class Block(pygame.sprite.Sprite):
         if self.rect.y >= HEIGHT:
             del self  # когда доходит до края уничтожаем блок
             return 0
-        self.rect.y += 150
+        self.rect.y += 100
         return self
 
 
@@ -134,32 +135,31 @@ if __name__ == '__main__':
     screen.fill(FCOLOR)
     pygame.display.update()
     clock = pygame.time.Clock()
+    # если заставка была закрыта
     if first_screen():
         screen.fill(FCOLOR)
         pygame.display.update()
-        # группа спрайтов для блоков
+        # группа спрайтов игрока
         all_sprites = pygame.sprite.Group()
+        # группа спрайтов блоков
         platforms = pygame.sprite.Group()
-        # Первая платформа
+        # начальная платформа
         initial_platform = Block(platforms, clock)
         initial_platform.rect.x = WIDTH // 2
         initial_platform.rect.y = HEIGHT - 50
-        #all_sprites.add(initial_platform)
-        # Другие платформы
+        # другие платформы начального экрана
         for i in range(5):
             p = Block(platforms, clock)
             p.rect.x = random.randrange(WIDTH - 50)
             p.rect.y = initial_platform.rect.y - 100 * (i + 1)
-            #all_sprites.add(p)
+        # спрайт игрока
         player = Player()
         all_sprites.add(player)
-        # спрайт фона игры
+        # спрайт фона игры (блоков)
         game = Display(platforms, clock)
         all_sprites.draw(screen)
         pygame.display.flip()
         running = True
-        hits = []
-        fl = False
         while running:
             pressed = pygame.key.get_pressed()
             all_sprites.draw(screen)
@@ -170,20 +170,21 @@ if __name__ == '__main__':
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LEFT:
                         player.speedx = -10  # Движение влево
-                        player.speedy = -15  # Движение влево
+                        player.speedy = -15  # Движение вверх
                     elif event.key == pygame.K_RIGHT:
                         player.speedx = 10  # Движение вправо
-                        player.speedy = -15  # Движение влево
+                        player.speedy = -15  # Движение вверх
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                         player.speedx = 0
             all_sprites.update()
             hits = pygame.sprite.spritecollide(player, platforms, False)
+            # если сталкивается с блоком
             if hits:
-                print(hits, end='\n')
                 player.speedy = -15  # Прыжок
-                if hits[0] != initial_platform and player.rect.top < HEIGHT // 2:
-                    game.update()
+                # если это не стартовый блок и игрок достиг середины экрана
+                if hits[0] != initial_platform and player.rect.top <= HEIGHT // 2:
+                    game.update()  # двигаем блоки(продвигаем игрока вверх)
             screen.fill(WHITE)
             all_sprites.draw(screen)
             platforms.draw(screen)
