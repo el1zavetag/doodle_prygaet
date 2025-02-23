@@ -139,6 +139,7 @@ if __name__ == '__main__':
     screen.fill(FCOLOR)
     pygame.display.update()
     clock = pygame.time.Clock()
+
     # если заставка была закрыта
     if first_screen():
         screen.fill(FCOLOR)
