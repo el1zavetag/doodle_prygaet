@@ -29,6 +29,31 @@ def terminate():
     pygame.quit()
     sys.exit()
 
+def end_screen():
+    intro_text = ["Press any button to continue"]
+
+    fon = pygame.transform.scale(load_image('game over.png'), (800, 600))
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 30)
+    text_coord = 2
+    # выводим описание игры
+    for line in intro_text:
+        string_rendered = font.render(line, 1, (19, 50, 21))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 270
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+                return True
+        pygame.display.flip()
+        clock.tick(FPS)
 
 # заставка игры
 def first_screen():
@@ -92,8 +117,10 @@ class Player(pygame.sprite.Sprite):
 
         clock.tick(FPS)
 
-        if self.rect.top > HEIGHT:  # Если игрок падает ниже экрана
+        if self.rect.top >= HEIGHT:  # Если игрок падает ниже экрана
             self.kill()
+            end_screen()
+            print('yvu')
 
 
 # спрайт одного блока
