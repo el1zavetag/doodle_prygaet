@@ -2,6 +2,7 @@ import os
 import sys
 import pygame
 import random
+import csv
 
 pygame.init()
 
@@ -12,6 +13,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 FCOLOR = WHITE
+RECORD = 0
 
 
 # загрузка изображения для спрайтов
@@ -30,6 +32,9 @@ def terminate():
     sys.exit()
 
 def end_screen():
+    with open('records.csv', 'w', newline='', encoding="utf8") as csvfile:
+        writer = csv.writer(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        writer.writerow([RECORD])
     intro_text = ["Press any button to continue"]
 
     fon = pygame.transform.scale(load_image('game over.png'), (800, 600))
@@ -280,6 +285,7 @@ if __name__ == '__main__':
                     player.speedy = -10  # Прыжок
                     # если это не стартовый блок и игрок достиг середины экрана
                     if hits[0] != initial_platform and player.rect.top <= HEIGHT // 2 + 180:
+                        RECORD += 1
                         game.update()  # двигаем блоки(продвигаем игрока вверх)
                 screen.fill(WHITE)
                 all_sprites.draw(screen)
