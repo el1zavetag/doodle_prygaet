@@ -29,6 +29,31 @@ def terminate():
     pygame.quit()
     sys.exit()
 
+def end_screen():
+    intro_text = ["Press any button to continue"]
+
+    fon = pygame.transform.scale(load_image('game over.png'), (800, 600))
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 30)
+    text_coord = 150
+    # выводим описание игры
+    for line in intro_text:
+        string_rendered = font.render(line, 1, (19, 50, 21))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 270
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+                return True
+        pygame.display.flip()
+        clock.tick(FPS)
 
 # заставка игры
 def first_screen():
@@ -54,6 +79,61 @@ def first_screen():
                 terminate()
             elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
                 return True
+        pygame.display.flip()
+        clock.tick(FPS)
+
+#стартовое окно
+def start_window():
+    intro_text = ["DOODLE PRYGAET"]
+    nums = ["1", "2", "3", "4", "5"]
+    image = pygame.Surface([800, 600])
+    image.fill((243, 222, 211))
+
+    fon = pygame.transform.scale(image, (800, 600))
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font('Snap_ITC.ttf', 65)
+    text_coord = 70
+    # выводим описание игры
+    for line in intro_text:
+        string_rendered = font.render(line, 1, (19, 50, 21))
+        intro_rect = string_rendered.get_rect()
+        print(intro_rect.width)
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 50
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+    pygame.draw.rect(screen, (146, 173, 117), (60, 300, 110, 110))
+    pygame.draw.rect(screen, (146, 173, 117), (204, 300, 110, 110))
+    pygame.draw.rect(screen, (146, 173, 117), (348, 300, 110, 110))
+    pygame.draw.rect(screen, (146, 173, 117), (492, 300, 110, 110))
+    pygame.draw.rect(screen, (146, 173, 117), (636, 300, 110, 110))
+    text_coord = 100
+    for n in nums:
+        string_rendered = font.render(n, 1, (19, 50, 21))
+        intro_rect = string_rendered.get_rect()
+        print(intro_rect.width)
+        intro_rect.top = 310
+        intro_rect.x = text_coord
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+        text_coord += 55
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                pos = event.pos
+                if 60 <= pos[0] <= 170 and 300 <= pos[1] <= 410:
+                    return 1
+                elif 204 <= pos[0] <= 314 and 300 <= pos[1] <= 410:
+                    return 2
+                elif 348 <= pos[0] <= 458 and 300 <= pos[1] <= 410:
+                    return 3
+                elif 492 <= pos[0] <= 602 and 300 <= pos[1] <= 410:
+                    return 4
+                elif 636 <= pos[0] <= 746 and 300 <= pos[1] <= 410:
+                    return 5
         pygame.display.flip()
         clock.tick(FPS)
 
@@ -92,8 +172,10 @@ class Player(pygame.sprite.Sprite):
 
         clock.tick(FPS)
 
-        if self.rect.top > HEIGHT:  # Если игрок падает ниже экрана
+        if self.rect.top >= HEIGHT:  # Если игрок падает ниже экрана
             self.kill()
+            end_screen()
+            return True
 
 
 # спрайт одного блока
@@ -152,54 +234,55 @@ if __name__ == '__main__':
 
     # если заставка была закрыта
     if first_screen():
-        screen.fill(FCOLOR)
-        pygame.display.update()
-        # группа спрайтов игрока
-        all_sprites = pygame.sprite.Group()
-        # группа спрайтов блоков
-        platforms = pygame.sprite.Group()
-        # начальная платформа
-        initial_platform = Block(platforms, clock)
-        initial_platform.rect.x = WIDTH // 2
-        initial_platform.rect.y = HEIGHT - 50
-        # другие платформы начального экрана
-        for i in range(5):
-            p = Block(platforms, clock)
-            p.rect.x = random.randrange(WIDTH - 50)
-            p.rect.y = initial_platform.rect.y - 100 * (i + 1)
-        # спрайт игрока
-        player = Player()
-        all_sprites.add(player)
-        # спрайт фона игры (блоков)
-        game = Display(platforms, clock)
-        all_sprites.draw(screen)
-        pygame.display.flip()
-        running = True
-        while running:
-            pressed = pygame.key.get_pressed()
+        if start_window():
+            screen.fill(FCOLOR)
+            pygame.display.update()
+            # группа спрайтов игрока
+            all_sprites = pygame.sprite.Group()
+            # группа спрайтов блоков
+            platforms = pygame.sprite.Group()
+            # начальная платформа
+            initial_platform = Block(platforms, clock)
+            initial_platform.rect.x = WIDTH // 2
+            initial_platform.rect.y = HEIGHT - 50
+            # другие платформы начального экрана
+            for i in range(5):
+                p = Block(platforms, clock)
+                p.rect.x = random.randrange(WIDTH - 50)
+                p.rect.y = initial_platform.rect.y - 100 * (i + 1)
+            # спрайт игрока
+            player = Player()
+            all_sprites.add(player)
+            # спрайт фона игры (блоков)
+            game = Display(platforms, clock)
             all_sprites.draw(screen)
             pygame.display.flip()
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_LEFT:
-                        player.speedx = -10  # Движение влево
-                    elif event.key == pygame.K_RIGHT:
-                        player.speedx = 10  # Движение вправо
-                elif event.type == pygame.KEYUP:
-                    if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                        player.speedx = 0
-            all_sprites.update()
-            hits = pygame.sprite.spritecollide(player, platforms, False)
-            # если сталкивается с блоком
-            if hits:
-                player.speedy = -10  # Прыжок
-                # если это не стартовый блок и игрок достиг середины экрана
-                if hits[0] != initial_platform and player.rect.top <= HEIGHT // 2:
-                    game.update()  # двигаем блоки(продвигаем игрока вверх)
-            screen.fill(WHITE)
-            all_sprites.draw(screen)
-            platforms.draw(screen)
-            pygame.display.flip()
-        pygame.quit()
+            running = True
+            while running:
+                pressed = pygame.key.get_pressed()
+                all_sprites.draw(screen)
+                pygame.display.flip()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        running = False
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_LEFT:
+                            player.speedx = -10  # Движение влево
+                        elif event.key == pygame.K_RIGHT:
+                            player.speedx = 10  # Движение вправо
+                    elif event.type == pygame.KEYUP:
+                        if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                            player.speedx = 0
+                all_sprites.update()
+                hits = pygame.sprite.spritecollide(player, platforms, False)
+                # если сталкивается с блоком
+                if hits:
+                    player.speedy = -10  # Прыжок
+                    # если это не стартовый блок и игрок достиг середины экрана
+                    if hits[0] != initial_platform and player.rect.top <= HEIGHT // 2 + 180:
+                        game.update()  # двигаем блоки(продвигаем игрока вверх)
+                screen.fill(WHITE)
+                all_sprites.draw(screen)
+                platforms.draw(screen)
+                pygame.display.flip()
+            pygame.quit()
