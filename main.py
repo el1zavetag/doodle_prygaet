@@ -16,7 +16,7 @@ RECORD = 0
 
 # загрузка изображения для спрайтов
 def load_image(name, colorkey=None):
-    #загружаем изображение из папки data
+    # загружаем изображение из папки data
     fullname = os.path.join('data', name)
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
@@ -30,9 +30,10 @@ def terminate():
     pygame.quit()
     sys.exit()
 
-#класс финального окна
+
+# класс финального окна
 def end_screen(x):
-    recs = [] #получаем имеющие записи о рекордах
+    recs = []  # получаем имеющие записи о рекордах
     with open('records.csv', 'r', encoding="utf-8") as csvfile:
         reader = csv.reader(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for rec in reader:
@@ -61,7 +62,7 @@ def end_screen(x):
         screen.blit(string_rendered, intro_rect)
         temp -= 210
 
-    #если нажата enter выходим в главное меню
+    # если нажата enter выходим в главное меню
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -121,7 +122,7 @@ def start_window():
         intro_rect.x = 50
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
-    #кнопки уровней
+    # кнопки уровней
     pygame.draw.rect(screen, (146, 173, 117), (60, 300, 110, 110))
     pygame.draw.rect(screen, (146, 173, 117), (204, 300, 110, 110))
     pygame.draw.rect(screen, (146, 173, 117), (348, 300, 110, 110))
@@ -275,7 +276,7 @@ if __name__ == '__main__':
     # если заставка была закрыта
     if first_screen():
 
-        #пока пользователь не закроет игру
+        # пока пользователь не закроет игру
         while running:
             size, screen, clock = game_edit()
             # получаем уровень из стартового окна
@@ -307,7 +308,7 @@ if __name__ == '__main__':
                 pygame.display.flip()
                 finish = False
 
-                #пока игрок не выйдет из финального окна продолжаем игру
+                # пока игрок не выйдет из финального окна продолжаем игру
                 while not finish:
                     all_sprites.draw(screen)
                     pygame.display.flip()
@@ -323,10 +324,10 @@ if __name__ == '__main__':
                             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                                 player.speedx = 0
 
-                    #получаем информацию о том, умер ли игрок
+                    # получаем информацию о том, умер ли игрок
                     finish = player.update()
                     all_sprites.update()
-                    #количество столкновений с блоками
+                    # количество столкновений с блоками
                     hits = pygame.sprite.spritecollide(player, platforms, False)
                     # если сталкивается с блоком
                     if hits:
