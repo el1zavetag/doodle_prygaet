@@ -4,6 +4,7 @@ import pygame
 import random
 import csv
 
+# Начальные параметры
 WIDTH = 800
 HEIGHT = 600
 FPS = 120
@@ -38,6 +39,7 @@ def end_screen(x):
         reader = csv.reader(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for rec in reader:
             recs = [int(i) for i in rec]
+
     # переписываем рекорд если он стал больше предыдущего
     with open('records.csv', 'w', newline='', encoding="utf8") as csvfile:
         writer = csv.writer(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -46,11 +48,13 @@ def end_screen(x):
         writer.writerow(recs)
     intro_text = [str(RECORD), "Press ENTER to continue"]
 
+    # Если игрок проиграл
     fon = pygame.transform.scale(load_image('game over.png'), (800, 600))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 50)
     text_coord = 130
     temp = 400
+
     # выводим текст финишного окна
     for line in intro_text:
         string_rendered = font.render(line, 1, (19, 50, 21))
@@ -81,6 +85,7 @@ def first_screen():
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 30)
     text_coord = 550
+
     # выводим текст заставки
     for line in intro_text:
         string_rendered = font.render(line, 1, (19, 50, 21))
@@ -113,6 +118,7 @@ def start_window():
     screen.blit(fon, (0, 0))
     font = pygame.font.Font('Snap_ITC.ttf', 65)
     text_coord = 70
+
     # выводим описание игры
     for line in intro_text:
         string_rendered = font.render(line, 1, (19, 50, 21))
@@ -122,12 +128,14 @@ def start_window():
         intro_rect.x = 50
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
+
     # кнопки уровней
     pygame.draw.rect(screen, (146, 173, 117), (60, 300, 110, 110))
     pygame.draw.rect(screen, (146, 173, 117), (204, 300, 110, 110))
     pygame.draw.rect(screen, (146, 173, 117), (348, 300, 110, 110))
     pygame.draw.rect(screen, (146, 173, 117), (492, 300, 110, 110))
     pygame.draw.rect(screen, (146, 173, 117), (636, 300, 110, 110))
+
     text_coord = 100
     for n in nums:
         string_rendered = font.render(n, 1, (19, 50, 21))
@@ -137,12 +145,14 @@ def start_window():
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
         text_coord += 55
+
     # получаем рекорды за каждый уровень
     with open('records.csv', 'r', encoding="utf-8") as csvfile:
         reader = csv.reader(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         text_coord = 60
         font = pygame.font.Font(None, 30)
         for r in reader:
+
             # выводим рекорд за каждый уровень
             for j in r:
                 string_rendered = font.render(j, 1, (19, 50, 21))
@@ -152,12 +162,15 @@ def start_window():
                 text_coord += intro_rect.height
                 screen.blit(string_rendered, intro_rect)
                 text_coord += 124
+
+    # Выбор уровня
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = event.pos
+
                 # определяем какой уровень выбран
                 if 60 <= pos[0] <= 170 and 300 <= pos[1] <= 410:
                     return 1
@@ -186,7 +199,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.centerx = WIDTH // 2  # Положение по центру
         self.rect.bottom = HEIGHT - 50  # Положение внизу экрана
         self.speedy = 0  # Начальная скорость
-        self.gravity = 0.2 + lvl * 0.01  # Гравитация
+        self.gravity = 0.1 + lvl * 0.05  # Гравитация
         self.speedx = 0  # Горизонтальная скорость
         self.level = lvl  # уровень игры
 
@@ -231,7 +244,6 @@ class Block(pygame.sprite.Sprite):
 
     # передвижение блока на 100 пикс. ниже
     def update(self):
-        screen.fill(FCOLOR)
         if self.rect.y >= HEIGHT:
             self.kill()  # когда доходит до края уничтожаем блок
             return 0
@@ -251,7 +263,7 @@ class Display(pygame.sprite.Sprite):
         self.clock = clock
 
     def update(self):
-        # добавляем новый юлок при передвижении персонажа(чтобы их бфло бесконечное количество)
+        # добавляем новый блок при передвижении персонажа(чтобы их было бесконечное количество)
         Block(self.group, self.clock)
         screen.fill(FCOLOR)
         self.group.update()  # обновляем пложение всех блоков
@@ -259,12 +271,12 @@ class Display(pygame.sprite.Sprite):
         return self
 
 
+#Основные настройки игрового окна
 def game_edit():
     pygame.init()
     size = WIDTH, HEIGHT
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption('Doodle prygaet')
-    screen.fill(FCOLOR)
     pygame.display.update()
     clock = pygame.time.Clock()
     return size, screen, clock
@@ -279,6 +291,7 @@ if __name__ == '__main__':
         # пока пользователь не закроет игру
         while running:
             size, screen, clock = game_edit()
+
             # получаем уровень из стартового окна
             lvl = start_window()
             if lvl:
@@ -332,7 +345,8 @@ if __name__ == '__main__':
                     # если сталкивается с блоком
                     if hits:
                         player.speedy = -10  # Прыжок
-                        # если это не стартовый блок и игрок достиг середины экрана
+
+                        # если это не стартовый блок и игрок достиг линии обновления поля
                         if hits[0] != initial_platform and player.rect.top <= HEIGHT // 2 + 150:
                             RECORD += 1
                             game.update()  # двигаем блоки(продвигаем игрока вверх)
