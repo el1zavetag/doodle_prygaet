@@ -279,18 +279,19 @@ def game_edit():
     pygame.display.set_caption('Doodle prygaet')
     pygame.display.update()
     clock = pygame.time.Clock()
-    return size, screen, clock
+    RECORD = 0
+    return size, screen, clock, RECORD
 
 
 if __name__ == '__main__':
-    size, screen, clock = game_edit()
+    size, screen, clock, RECORD = game_edit()
     running = True
     # если заставка была закрыта
     if first_screen():
 
         # пока пользователь не закроет игру
         while running:
-            size, screen, clock = game_edit()
+            size, screen, clock, RECORD = game_edit()
 
             # получаем уровень из стартового окна
             lvl = start_window()
